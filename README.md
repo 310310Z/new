@@ -1,9 +1,9 @@
 # new
 ## 環境構築手順  
 ### 必要なツール
-Node.js
-npm
-Docker
+Node.js  
+npm  
+Docker  
 ### 手順
 Node.jsを公式サイトからダウンロードし  
 ```node -v```  でインストールを確認、下記を実行する  
