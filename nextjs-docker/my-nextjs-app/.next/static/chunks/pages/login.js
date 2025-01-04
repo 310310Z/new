@@ -1,0 +1,10 @@
+__turbopack_load_page_chunks__("/login", [
+  "static/chunks/node_modules_next_76d513._.js",
+  "static/chunks/node_modules_react-dom_82bb97._.js",
+  "static/chunks/node_modules_@supabase_auth-js_dist_module_0575c8._.js",
+  "static/chunks/node_modules_840fa7._.js",
+  "static/chunks/[root of the server]__d255dd._.js",
+  "static/chunks/node_modules_6e62b5._.js",
+  "static/chunks/pages_login_5771e1._.js",
+  "static/chunks/pages_login_3f909f._.js"
+])
