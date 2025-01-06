@@ -15,7 +15,7 @@ const Login = () => {
     });
 
     if (error) {
-      setErrorMessage(error.message); // エラーを表示
+      setErrorMessage("正しいメールとパスワードを入力してください"); // エラーを表示
     } else if (data.user) {
       console.log('Logged In:', data.user);
       router.push('/dashboard'); // ログイン成功後に /dashboard へリダイレクト
@@ -24,7 +24,7 @@ const Login = () => {
 
   return (
     <div>
-      <h2>Login</h2>
+      <h2>ログイン画面</h2>
       {errorMessage && <p style={{ color: 'red' }}>{errorMessage}</p>}
       <input
         type="email"
