@@ -1,0 +1,162 @@
+---
+title: 'Connect to your database'
+description: 'Connect to Postgres from your frontend, backend, or serverless environment'
+subtitle: 'Connect to Postgres from your frontend, backend, or serverless environment'
+---
+
+## Quick summary
+
+How you connect to your database depends on where you're connecting from:
+
+- For frontend applications, use the [Data API](#data-apis-and-client-libraries)
+- For Postgres clients, use a connection string
+  - For persistent clients (for example, long-running servers or database GUIs) use the [direct connection string](#direct-connection) if your environment supports IPv6, and [Supavisor session mode](#supavisor-session-mode) if not
+  - For temporary clients (for example, serverless or edge functions) use [Supavisor transaction mode](#supavisor-transaction-mode)
+
+## Quickstarts
+
+<div className="grid grid-cols-[repeat(auto-fit,minmax(150px,1fr))] gap-6   not-prose">
+  <NavData data="ormQuickstarts">
+    {(data) =>
+      data.items?.map((quickstart) => (
+        <Link key={quickstart.url} href={quickstart.url} passHref>
+          <GlassPanel
+            key={quickstart.name}
+            title={quickstart.name}
+            className="[&>div]:p-2 flex justify-center [&_p]:text-foreground-light"
+          />
+        </Link>
+      ))
+    }
+  </NavData>
+  <NavData data="guiQuickstarts">
+    {(data) =>
+      data.items?.map((quickstart) => (
+        <Link key={quickstart.url} href={quickstart.url} passHref>
+          <GlassPanel
+            key={quickstart.name}
+            title={quickstart.name}
+            className="[&>div]:p-2 flex justify-center [&_p]:text-foreground-light"
+          />
+        </Link>
+      ))
+    }
+  </NavData>
+</div>
+
+## Data APIs and client libraries
+
+The Data APIs allow you to interact with your database using REST or GraphQL requests. You can use these APIs to fetch and insert data from the frontend, as long as you have [RLS](/docs/guides/database/postgres/row-level-security) enabled.
+
+- [REST](/docs/guides/api)
+- [GraphQL](/docs/guides/graphql/api)
+
+For convenience, you can also use the Supabase client libraries, which wrap the Data APIs with a developer-friendly interface and automatically handle authentication:
+
+- [JavaScript](/docs/reference/javascript)
+- [Flutter](/docs/reference/dart)
+- [Swift](/docs/reference/swift)
+- [Python](/docs/reference/python)
+- [C#](/docs/reference/csharp)
+- [Kotlin](/docs/reference/kotlin)
+
+## Direct connection
+
+The direct connection string connects directly to your Postgres instance. It is ideal for persistent servers, such as virtual machines (VMs) and long-lasting containers. Examples include AWS EC2 machines, Fly.io VMs, and DigitalOcean Droplets.
+
+<Admonition type="caution">
+
+Direct connections use IPv6 by default. If your environment doesn't support IPv6, use [Supavisor session mode](#supavisor-session-mode) or get the [IPv4 addon](/docs/guides/platform/ipv4-address).
+
+</Admonition>
+
+The connection string looks like this:
+
+```
+postgresql://postgres:[YOUR-PASSWORD]@db.apbkobhfnmcqqzqeeqss.supabase.co:5432/postgres
+```
+
+Get your project's direct string from the [Database Settings](/dashboard/project/_/settings/database) page:
+
+1. Go to the `Settings` section.
+2. Click `Database`.
+3. Under `Connection string`, make sure `Display connection pooler` is unchecked. Copy the URI.
+
+## Supavisor session mode
+
+The session mode connection string connects to your Postgres instance via a proxy. This is ideal for persistent servers when IPv4 is not supported.
+
+The connection string looks like this:
+
+```
+postgres://postgres.apbkobhfnmcqqzqeeqss:[YOUR-PASSWORD]@aws-0-ca-central-1.pooler.supabase.com:5432/postgres
+```
+
+Get your project's session mode string from the [Database Settings](/dashboard/project/_/settings/database) page:
+
+1. Go to the `Settings` section.
+2. Click `Database`.
+3. Under `Connection string`, make sure `Display connection pooler` is checked and `Session mode` is selected. Copy the URI.
+
+## Supavisor transaction mode
+
+The transaction mode connection string connects to your Postgres instance via a proxy which serves as a connection pooler. This is deal for serverless or edge functions, which require many transient connections.
+
+<Admonition type="caution">
+
+Transaction mode does not support [prepared statements](https://postgresql.org/docs/current/sql-prepare.html). To avoid errors, [turn off prepared statements](https://github.com/orgs/supabase/discussions/28239) for your connection library.
+
+</Admonition>
+
+The connection string looks like this:
+
+```
+postgres://postgres.apbkobhfnmcqqzqeeqss:[YOUR-PASSWORD]@aws-0-ca-central-1.pooler.supabase.com:6543/postgres
+```
+
+Get your project's transaction mode string from the [Database Settings](/dashboard/project/_/settings/database) page:
+
+1. Go to the `Settings` section.
+2. Click `Database`.
+3. Under `Connection string`, make sure `Display connection pooler` is checked and `Transaction mode` is selected. Copy the URI.
+
+## More about connection pooling
+
+Connection pooling improves database performance by reusing existing connections between queries. This reduces the overhead of establishing connections and improves scalability.
+
+You can use an application-side pooler or a server-side pooler (Supabase automatically provides one called Supavisor), depending on whether your backend is persistent or serverless.
+
+### Application-side poolers
+
+Application-side poolers are built into connection libraries and API servers, such as Prisma, SQLAlchemy, and PostgREST. They maintain several active connections with Postgres or a server-side pooler, reducing the overhead of establishing connections between queries. When deploying to static architecture, such as long-standing containers or VMs, application-side poolers are satisfactory on their own.
+
+### Serverside poolers
+
+Postgres connections are like a WebSocket. Once established, they are preserved until the client (application server) disconnects. A server might only make a single 10 ms query, but needlessly reserve its database connection for seconds or longer.
+
+Serverside-poolers, such as Supabase's [Supavisor](https://github.com/supabase/supavisor) in transaction mode, sit between clients and the database and can be thought of as load balancers for Postgres connections.
+
+<Image
+  alt="New migration files trigger migrations on the preview instance."
+  src={{
+    dark: '/docs/img/guides/database/connecting-to-postgres/how-connection-pooling-works.png',
+    light:
+      '/docs/img/guides/database/connecting-to-postgres/how-connection-pooling-works--light.png',
+  }}
+  caption="Connecting to the database directly vs using a Connection Pooler"
+  zoomable
+/>
+
+They maintain hot connections with the database and intelligently share them with clients only when needed, maximizing the amount of queries a single connection can service. They're best used to manage queries from auto-scaling systems, such as edge and serverless functions.
+
+## Connecting with SSL
+
+You should connect to your database using SSL wherever possible, to prevent snooping and man-in-the-middle attacks.
+
+You can obtain your connection info and Server root certificate from your application's dashboard:
+
+![Connection Info and Certificate.](/docs/img/database/database-settings-ssl.png)
+
+## Resources
+
+- [Connection management](/docs/guides/database/connection-management)

@@ -1,0 +1,25 @@
+sources:
+  file_source:
+    type: "file"
+    path: "/var/log/some_log_file.log"  # 読み込むログファイルのパス
+    ignore_older: 86400  # 1日以上古いログを無視
+    include:
+      - "*.log"  # .logファイルのみを対象にする
+
+sinks:
+  supabase_sink:
+    type: "http"
+    uri: "https://kulmsxibdjegdqguwljk.supabase.co/logs"  # Supabaseのエンドポイントに置き換え
+    method: "POST"
+    encoding:
+      codec: "json"  # JSONエンコードを指定
+    inputs:
+      - "file_source"  # 入力ソースとしてfile_sourceを指定
+
+transforms:
+  json_transform:
+    type: "remap"
+    inputs:
+      - "file_source"  # file_sourceからデータを取り出す
+    source: |
+      .message = parse_json(.message)  # .messageフィールドをJSONとしてパース

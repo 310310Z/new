@@ -1,0 +1,55 @@
+# Node.js / JavaScript / TypeScript 関連
+/node_modules              # Node.jsの依存関係
+npm-debug.log*             # npmのデバッグログ
+yarn-debug.log*            # Yarnのデバッグログ
+yarn-error.log*            # Yarnエラーログ
+.pnp                       # PnP (Plug'n'Play) 設定
+.pnp.*                     # PnP設定の補助ファイル
+.yarn/                     # Yarnの管理ディレクトリ
+!.yarn/patches             # 特定のパッチを除外
+!.yarn/plugins             # 特定のプラグインを除外
+!.yarn/releases            # 特定のリリースを除外
+!.yarn/versions            # 特定のバージョンを除外
+
+# テスト結果 / カバレッジ
+/coverage                  # テストカバレッジ結果
+
+# Docker 関連
+docker-compose.yml         # Docker Composeの設定ファイル（含める）
+dockerfile                 # Dockerfile（含める）
+
+# Supabase 関連
+supabase/.branches         # Supabase のブランチ情報
+supabase/.temp             # Supabase の一時ファイル
+
+# 環境変数設定ファイル
+.env                       # 環境設定ファイル（Git に含めない）
+.env.local                 # ローカル環境変数（Git に含めない）
+.env.development           # 開発環境
+.env.test                  # テスト環境
+.env.production            # 本番環境
+.env.staging               # ステージング環境
+
+# ローカルの環境設定ファイル
+.env.local                 # ローカル環境設定ファイル（含めない）
+
+# ローカル IDE / エディタ設定
+.vscode                    # VSCodeの設定ファイル
+.idea                      # JetBrains系 IDE の設定ファイル
+
+# コンパイル出力
+*.next/                    # Next.js のコンパイルディレクトリ
+
+# その他の不要ファイル
+.DS_Store                  # MacOS のメタファイル
+*.pem                      # 証明書ファイル
+
+# UI tokens
+packages/ui/tokens/**/*.json  # UI トークン
+
+# ログファイル（Supabase 自体のログ）
+gcloud.json                # Google Cloud ログ
+
+# sitemaps
+# apps/www/public/*.xml
+# apps/docs/public/*.xml
